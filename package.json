@@ -14,8 +14,10 @@
     "bcrypt": "^5.1.1",
     "config": "^3.3.11",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
     "path": "^0.12.7",
     "pg": "^8.11.3",
+    "shortid": "^2.2.16",
     "zod": "^3.22.4"
   },
   "devDependencies": {
