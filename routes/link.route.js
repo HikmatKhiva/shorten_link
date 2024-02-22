@@ -37,7 +37,7 @@ linkRouter.get("/:id", middleware, async (req, res) => {
 linkRouter.post("/generate", middleware, async (req, res) => {
   try {
     const user = req.user;
-    const baseUrl = config.get("baseURL");
+    const baseUrl = process.env.baseUrl || config.get("baseURL");
     const { from } = req.body;
     console.log(from);
     const code = shortid.generate();
