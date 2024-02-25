@@ -38,19 +38,25 @@ linkRouter.post("/generate", middleware, async (req, res) => {
   try {
     const user = req.user;
     const baseUrl = process.env.baseUrl || config.get("baseURL");
-    const { from } = req.body;
-    console.log(from);
+    const { url: from } = req.body;
+    const link = await pool.query(
+      `
+      SELECT * FROM links WHERE link_from = $1
+    `,
+      [from]
+    );
+    if (link.rowCount !== 0) {
+      return res.status(400).json({ message: "Link already exists" });
+    }
     const code = shortid.generate();
     const to = baseUrl + "/t/" + code;
-    console.log(to);
     const newLink = await pool.query(
-      `INSERT INTO links("linkFrom","linkTo","linkCode",owner,"date_time") VALUES($1,$2,$3,$4,$5) RETURNING *`,
+      `INSERT INTO links(link_from,link_to,link_code,owner,date_time) VALUES($1,$2,$3,$4,$5) RETURNING *`,
       [from, to, code, user.id, new Date()]
     );
-    console.log(newLink);
     res
       .status(201)
-      .json({ message: "generate successfully", link: newLink.rows });
+      .json({ message: "generate successfully", link: newLink.rows[0] });
   } catch (error) {
     res.status(500).json({ message: error });
   }
