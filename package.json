@@ -6,22 +6,29 @@
   "type": "module",
   "scripts": {
     "server": "nodemon server.js",
-    "start":"node server.js"
+    "start": "cross-env NODE_ENV=production node app.js",
+    "client": "npm run dev --prefix client",
+    "client:install": "npm install --prefix client",
+    "client:built": "npm run build --prefix client",
+    "dev": "cross-env NODE_ENV=development concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "concurrently": "^8.2.2",
     "config": "^3.3.11",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "path": "^0.12.7",
     "pg": "^8.11.3",
-    "shortid": "^2.2.16",
-    "zod": "^3.22.4"
+    "shortid": "^2.2.16"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "nodemon": "^3.0.3"
   }
 }
