@@ -11,6 +11,7 @@ dotenv.config();
 const PORT = process.env?.PORT || config.get("PORT") || 5500;
 app.use(express.json({ extended: true }));
 app.use(cors());
+const __dirname = path.resolve();
 
 if (process.env.NODE_ENV === "production") {
   app.use("/", express.static(path.join(__dirname, "client", "build")));

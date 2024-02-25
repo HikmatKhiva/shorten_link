@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "server": "nodemon server.js",
-    "start": "cross-env NODE_ENV=production node app.js",
+    "start": "cross-env NODE_ENV=production concurrently \"node app.js\" \"npm run client:install\" \"npm run client:build\"",
     "client": "npm run dev --prefix client",
     "client:install": "npm install --prefix client",
     "client:built": "npm run build --prefix client",
