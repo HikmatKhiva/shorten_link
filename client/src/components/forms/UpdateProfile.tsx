@@ -1,4 +1,4 @@
-import { useForm, Form, SubmitHandler } from "react-hook-form";
+import { useForm, Form } from "react-hook-form";
 import { useHttp } from "../../hooks/use.http";
 import { ErrorDisplay } from "../errors/ErrorDisplay";
 import { zodResolver } from "@hookform/resolvers/zod";
