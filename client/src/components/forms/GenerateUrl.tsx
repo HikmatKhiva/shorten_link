@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, Form } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { linkSchema } from "../../validation";
 import { useNavigate } from "react-router-dom";
 import { useHttp } from "../../hooks/use.http";
@@ -10,14 +10,13 @@ const GenerateUrl = () => {
   const navigate = useNavigate();
   const {
     register,
-    control,
     reset,
     handleSubmit,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(linkSchema),
   });
-  const onSubmit: any = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit(async (data) => {
     const response = await request("links/generate", "POST", data);
     toast.success(response?.message);
     if (response.message === "generate successfully") {
@@ -26,11 +25,7 @@ const GenerateUrl = () => {
     }
   });
   return (
-    <Form
-      control={control}
-      onSubmit={onSubmit}
-      className="flex flex-col gap-y-2 "
-    >
+    <form onSubmit={onSubmit} className="flex flex-col gap-y-2 ">
       <div className="flex items-center md:flex-row">
         <label htmlFor="url" className="flex-grow">
           <input
@@ -49,8 +44,8 @@ const GenerateUrl = () => {
           Generate
         </button>
       </div>
-      <ErrorDisplay error={errors["url"]} />
-    </Form>
+      <ErrorDisplay message={errors["url"]?.message?.toString()} />
+    </form>
   );
 };
 export default GenerateUrl;

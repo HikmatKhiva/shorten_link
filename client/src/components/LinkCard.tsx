@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { FaLink } from "react-icons/fa6";
-import { FaEye } from "react-icons/fa";
+import { FaLink, FaEye } from "react-icons/fa6";
 import { CiCalendarDate } from "react-icons/ci";
 import { MdDelete } from "react-icons/md";
 import { useHttp } from "../hooks/use.http";
@@ -9,17 +8,15 @@ import { toast } from "react-toastify";
 const LinkCard = ({ link }: { link: Link }) => {
   const client = useQueryClient();
   const [linkCode, setLinkCode] = useState<string>("");
-  const { request } = useHttp();
+  const { deleteLink } = useHttp();
   const handleDelete = async (id: number) => {
-    const response = await request("links/" + id, "DELETE");
+    const response = await deleteLink("links/" + id);
     toast.success(response?.message);
     await client.invalidateQueries({ queryKey: ["links"] });
   };
   const handleCopy = (url: Link) => {
     setLinkCode(url.link_code);
-    if (navigator) {
-      return navigator.clipboard.writeText(url.link_to);
-    }
+    if (navigator) return navigator.clipboard.writeText(url.link_to);
   };
   return (
     <li

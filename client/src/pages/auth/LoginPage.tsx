@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
-import { useForm, Form } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../validation";
 import { ErrorDisplay } from "../../components/errors/ErrorDisplay";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "../../hooks/app";
 import { login } from "../../store/slice/userSlice";
+import { auth } from "../../api/auth";
 const LoginPage = () => {
   const dispatch = useAppDispatch();
   const [inputPasswordType, setInputPasswordType] =
@@ -16,46 +17,31 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const {
     register,
-    control,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
-
-  const onSubmit: any = handleSubmit(async (data) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`http://localhost:5500/api/auth/login`, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const user = await response.json();
-      if (!response.ok) {
-        setLoading(false);
-        return toast.error(user?.message);
-      }
-      dispatch(login(user));
-      toast.success("User Login Successfully");
-      reset();
+  const onSubmit = handleSubmit(async (data) => {
+    setLoading(true);
+    const user = await auth("http://localhost:5500/api/auth/login", data);
+    if (typeof user == "string") {
       setLoading(false);
-      navigate("/");
-    } catch (error) {
-      toast.error("some thing went wrong");
-      setLoading(false);
+      return toast.info(user);
     }
+    dispatch(login(user));
+    toast.success("User Login Successfully");
+    reset();
+    setLoading(false);
+    navigate("/");
   });
   const handleClickPasswordType = () =>
     setInputPasswordType((prev) => (prev == "text" ? "password" : "text"));
   return (
     <div className="text-center">
       <h2 className="mb-2 text-xl text-gray-950 text-center">LoginPage</h2>
-      <Form
-        control={control}
+      <form
         method="post"
         onSubmit={onSubmit}
         className="md:max-w-[420px] max-w-72 w-[400px] rounded bg-primary-blue p-5 pt-10 flex flex-col gap-y-3"
@@ -71,7 +57,7 @@ const LoginPage = () => {
               placeholder="Enter Your Email"
             />
           </label>
-          <ErrorDisplay error={errors["email"]} />
+          <ErrorDisplay message={errors["email"]?.message?.toString()} />
         </div>
         <div className="text-start">
           <label htmlFor="password" className="relative w-full">
@@ -95,7 +81,7 @@ const LoginPage = () => {
               )}
             </button>
           </label>
-          <ErrorDisplay error={errors["password"]} />
+          <ErrorDisplay message={errors["password"]?.message?.toString()} />
         </div>
         <button
           disabled={
@@ -115,7 +101,7 @@ const LoginPage = () => {
             Register
           </Link>
         </p>
-      </Form>
+      </form>
     </div>
   );
 };

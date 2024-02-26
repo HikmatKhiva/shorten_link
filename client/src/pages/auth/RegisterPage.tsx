@@ -2,12 +2,13 @@ import { useState } from "react";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import { registerSchema } from "../../validation";
-import { useForm, Form } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorDisplay } from "../../components/errors/ErrorDisplay";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "../../hooks/app";
 import { login } from "../../store/slice/userSlice";
+import { auth } from "../../api/auth";
 const RegisterPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -17,27 +18,25 @@ const RegisterPage = () => {
   const handleClickPasswordType = () =>
     setInputPasswordType((prev) => (prev == "text" ? "password" : "text"));
   const {
-    control,
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(registerSchema),
   });
-  const onSubmit: any = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit(async (data) => {
+    console.log(data);
+
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5500/api/auth/register`, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const user = await response.json();
-      if (!response.ok) {
+      const user = await auth("http://localhost:5500/api/auth/register", data);
+      if (typeof user == "string") {
         setLoading(false);
-        return toast.error(user.message);
+        return toast.info(user);
+      }
+      if (user.name === "error") {
+        setLoading(false);
+        return toast.info(user.detail);
       }
       toast.success("user register successfully");
       dispatch(login(user));
@@ -51,8 +50,7 @@ const RegisterPage = () => {
   return (
     <div className="text-center">
       <h2 className="mb-2 text-xl text-gray-950">Register</h2>
-      <Form
-        control={control}
+      <form
         onSubmit={onSubmit}
         className="md:max-w-[420px] max-w-72 w-[400px] rounded bg-primary-blue p-5 pt-10 flex flex-col gap-y-3"
       >
@@ -67,7 +65,10 @@ const RegisterPage = () => {
               placeholder="Enter Your Name"
             />
           </label>
-          <ErrorDisplay error={errors["name"]} />
+          {/* {errors['name']?.message && <span className="text-red-500 pt-1 font-medium">
+            {errors["name"]?.message.toString()}
+          </span>} */}
+          <ErrorDisplay message={errors["name"]?.message?.toString()} />
         </div>
         <div className="text-start">
           <label htmlFor="email" className="relative w-full">
@@ -80,7 +81,7 @@ const RegisterPage = () => {
               placeholder="Enter Your Email"
             />
           </label>
-          <ErrorDisplay error={errors["email"]} />
+          <ErrorDisplay message={errors["email"]?.message?.toString()} />
         </div>
         <div className="text-start">
           <label htmlFor="password" className="relative w-full">
@@ -104,7 +105,7 @@ const RegisterPage = () => {
               )}
             </button>
           </label>
-          <ErrorDisplay error={errors["password"]} />
+          <ErrorDisplay message={errors["password"]?.message?.toString()} />
         </div>
         <button
           type="submit"
@@ -124,7 +125,7 @@ const RegisterPage = () => {
             Login
           </Link>
         </p>
-      </Form>
+      </form>
     </div>
   );
 };
