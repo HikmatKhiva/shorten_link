@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import config from "config";
 import { middleware } from "../middleware/middleware.js";
 export const authRouter = Router();
+
 // new User Register
 authRouter.post("/register", async (req, res) => {
   try {
