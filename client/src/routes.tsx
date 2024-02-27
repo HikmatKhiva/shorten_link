@@ -1,14 +1,23 @@
-import { createBrowserRouter } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Layout from "./layouts/Layout";
-import LazyLoad from "./layouts/LazyLoad";
 import ProtectRoute from "./middleware/ProtectRoute";
 import LoginLayout from "./layouts/LoginLayout";
-import ErrorPage from "./pages/ErrorPage";
-import PageNotFound from "./pages/PageNotFound";
-export const router = createBrowserRouter([
+import { Suspense, lazy } from "react";
+import LoadingPage from "./components/LoadingPage";
+const LinksPage = lazy(() => import("./pages/LinksPage"));
+const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/auth/RegisterPage"));
+const CreateLink = lazy(() => import("./pages/CreateLink"));
+const PageNotFound = lazy(() => import("./pages/PageNotFound"));
+const ErrorPage = lazy(() => import("./pages/ErrorPage"));
+const routes = createBrowserRouter([
   {
     path: "/",
-    errorElement: <ErrorPage />,
+    errorElement: (
+      <Suspense fallback={<LoadingPage />}>
+        <ErrorPage />,
+      </Suspense>
+    ),
     element: (
       <ProtectRoute>
         <Layout />
@@ -17,34 +26,64 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <LazyLoad pageName="../pages/LinksPage" />,
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <LinksPage />
+          </Suspense>
+        ),
       },
       {
         path: "/create",
-        element: <LazyLoad pageName="../pages/CreateLink" />,
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <CreateLink />,
+          </Suspense>
+        ),
       },
       {
         path: "*",
-        element: <PageNotFound />,
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <PageNotFound />,
+          </Suspense>
+        ),
       },
     ],
   },
   {
     path: "/",
     element: <LoginLayout />,
+    errorElement: (
+      <Suspense fallback={<LoadingPage />}>
+        <ErrorPage />,
+      </Suspense>
+    ),
     children: [
       {
         path: "/login",
-        element: <LazyLoad pageName="../pages/auth/LoginPage" />,
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <LoginPage />
+          </Suspense>
+        ),
       },
       {
         path: "/register",
-        element: <LazyLoad pageName="../pages/auth/RegisterPage" />,
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <RegisterPage />
+          </Suspense>
+        ),
       },
       {
         path: "*",
-        element: <PageNotFound />,
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <PageNotFound />,
+          </Suspense>
+        ),
       },
     ],
   },
 ]);
+export const Routes = () => <RouterProvider router={routes} />;
