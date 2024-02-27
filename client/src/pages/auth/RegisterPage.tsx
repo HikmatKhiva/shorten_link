@@ -25,27 +25,16 @@ const RegisterPage = () => {
     resolver: zodResolver(registerSchema),
   });
   const onSubmit = handleSubmit(async (data) => {
-    console.log(data);
-
-    try {
-      setLoading(true);
-      const user = await auth("http://localhost:5500/api/auth/register", data);
-      if (typeof user == "string") {
-        setLoading(false);
-        return toast.info(user);
-      }
-      if (user.name === "error") {
-        setLoading(false);
-        return toast.info(user.detail);
-      }
-      toast.success("user register successfully");
-      dispatch(login(user));
-      navigate("/");
-      setLoading(false);
-    } catch (error) {
-      toast.error("some thing went wrong");
-      setLoading(false);
-    }
+    setLoading(true);
+    const user = await auth("auth/register", data);
+    setLoading(false);
+    if (user?.status === 500)
+      return toast.error("server shut down please try later");
+    if (typeof user == "string") return toast.info(user);
+    if (user.name === "error") return toast.info(user.detail);
+    toast.success("user register successfully");
+    dispatch(login(user));
+    navigate("/");
   });
   return (
     <div className="text-center">
@@ -65,9 +54,6 @@ const RegisterPage = () => {
               placeholder="Enter Your Name"
             />
           </label>
-          {/* {errors['name']?.message && <span className="text-red-500 pt-1 font-medium">
-            {errors["name"]?.message.toString()}
-          </span>} */}
           <ErrorDisplay message={errors["name"]?.message?.toString()} />
         </div>
         <div className="text-start">
