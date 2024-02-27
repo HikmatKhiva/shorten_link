@@ -25,15 +25,14 @@ const LoginPage = () => {
   });
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
-    const user = await auth("http://localhost:5500/api/auth/login", data);
-    if (typeof user == "string") {
-      setLoading(false);
-      return toast.info(user);
-    }
+    const user = await auth("auth/login", data);
+    setLoading(false);
+    if (user?.status === 500)
+      return toast.error("server shut down please try later");
+    if (typeof user == "string") return toast.info(user);
     dispatch(login(user));
     toast.success("User Login Successfully");
     reset();
-    setLoading(false);
     navigate("/");
   });
   const handleClickPasswordType = () =>
