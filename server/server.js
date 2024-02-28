@@ -2,6 +2,7 @@ import express from "express";
 import config from "config";
 import cors from "cors";
 import dotenv from "dotenv";
+import { logger, requestTime } from "./middleware/logger.js";
 // import path from "path";
 import { authRouter } from "./routes/auth.register.js";
 import { linkRouter } from "./routes/link.route.js";
@@ -11,6 +12,7 @@ dotenv.config();
 const PORT = process.env?.PORT || config.get("PORT") || 5500;
 app.use(express.json({ extended: true }));
 app.use(cors());
+app.use([requestTime, logger]);
 // const __dirname = path.resolve();
 // if (process.env.NODE_ENV === "production") {
 //   app.use("/", express.static(path.join(__dirname, "client", "dist")));
