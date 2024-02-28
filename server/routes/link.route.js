@@ -3,8 +3,9 @@ import { pool } from "../database/db.js";
 import { middleware } from "../middleware/middleware.js";
 import shortid from "shortid";
 import config from "config";
+import dotenv from "dotenv";
 export const linkRouter = Router();
-
+dotenv.config();
 linkRouter.get("/", middleware, async (req, res) => {
   try {
     const user = req.user;
