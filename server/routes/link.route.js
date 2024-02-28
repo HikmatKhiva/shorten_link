@@ -38,7 +38,7 @@ linkRouter.get("/:id", middleware, async (req, res) => {
 linkRouter.post("/generate", middleware, async (req, res) => {
   try {
     const user = req.user;
-    const baseUrl = process.env.baseUrl || config.get("baseURL");
+    const baseUrl = process.env.BASE_URL_API || config.get("baseURL");
     const { url: from } = req.body;
     const link = await pool.query(
       `
